@@ -4,9 +4,12 @@ from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
+import tld
 from bs4 import BeautifulSoup
 
-pocket_export = open("ril_export.html", 'r')
+from article_model import Article
+
+pocket_export = open("./pocket_analysis/ril_export.html", 'r')
 pocket_page = pocket_export.read()
 soup = BeautifulSoup(pocket_page, "html.parser")
 article_list = list(soup.find_all('a'))
@@ -22,38 +25,39 @@ def parse_article(articles):
     time_added = time.localtime(time_added)
     time_added = time.strftime("%Y-%m-%d %H:%M:%S", time_added)
     title = result.group(4).strip('"')
-    return Article(web_link, tags, time_added, title)
-
-
-class Article:
-    def __init__(self, web_link, tags, time_added, title):
-        self.web_link = web_link
-        self.tags = tags
-        self.time_added = time_added
-        self.title = title
-
-    def get_web_link(self):
-        return self.web_link
-
-    def get_tag(self):
-        return self.tags
+    year = time_added[0:4]
+    month = time_added[5:7]
+    date = time_added[8:10]
+    hour = time_added[11:13]
+    blog_link = tld.get_tld(url=web_link)
+    return Article(web_link=web_link, blog_link=blog_link, tags=tags,
+                   time_added=time_added, year=year, month=month, date=date,
+                   hour=hour, title=title)
 
 
 lists = map(parse_article, article_list)
 article_date_list = []  # 2018-03
 article_time_list = []  # 12:24
+article_blog_link = []
 for l in lists:
     time_string = l.time_added
     article_date_list.append(str(time_string)[0:7])
     article_time_list.append(int(str(time_string)[11:13]))
+    article_blog_link.append(l.blog_link)
 
 article_date_list = Counter(article_date_list)
 article_time_list = Counter(article_time_list)
+article_blog_link_list = Counter(article_blog_link)
 
-x_time = [k for k in article_date_list.keys()]
-x = [k for k in reversed(x_time)]
-y_count = [v for v in article_date_list.values()]
-y = [v for v in reversed(y_count)]
+article_blog_link_other_list = []
+count = 0
+article_blog_link_final_list = dict()
+for k in article_blog_link_list.keys():
+    v = article_blog_link_list.get(k)
+    if v <= 10:
+        count += v
+    else:
+        article_blog_link_final_list[k] = v
 
 
 def dict2list(dic: dict):
@@ -63,13 +67,24 @@ def dict2list(dic: dict):
     return lst
 
 
+article_blog_link_final_list = sorted(dict2list(article_blog_link_final_list), key=lambda x: x[1])
+print(article_blog_link_final_list)
+article_blog_link_final_list = dict(article_blog_link_final_list)
+article_blog_link_final_list["other"] = count
+article_blog_link_list = article_blog_link_final_list
+x_time = [k for k in article_date_list.keys()]
+x = [k for k in reversed(x_time)]
+y_count = [v for v in article_date_list.values()]
+y = [v for v in reversed(y_count)]
+
 article_time_list = sorted(dict2list(article_time_list), key=lambda x: x[0])
 article_time_list = dict(article_time_list)
 time_x = [k for k in article_time_list.keys()]
 time_y = [v for v in article_time_list.values()]
 
-# print(time_x)
-# print(time_y)
+
+blog_link_x = [k for k in article_blog_link_list.keys()]
+blog_link_y = [v for v in article_blog_link_list.values()]
 
 plt.figure(figsize=(200, 100))
 plt.title("Saved Article Statistics")
@@ -79,7 +94,7 @@ plt.plot(x, y, 'g', linewidth=2, )
 plt.grid(True)
 plt.legend()
 plt.xticks(rotation=45)
-plt.show()
+# plt.show()
 
 plt.figure(figsize=(200, 100))
 plt.title("Saved Article Statistics")
@@ -90,4 +105,14 @@ plt.grid(True)
 plt.legend()
 plt.xticks(rotation=45)
 plt.xticks(np.arange(min(time_x), max(time_x) + 1, 1.0))
+# plt.show()
+
+plt.figure(figsize=(200, 100))
+plt.title("Saved Article Statistics")
+plt.xlabel('the website of article source')
+plt.ylabel('Article Number')
+plt.plot(blog_link_x, blog_link_y, 'r', linewidth=2, )
+plt.grid(True)
+plt.legend()
+plt.xticks(range(len(blog_link_x)), blog_link_x, rotation=45)
 plt.show()
