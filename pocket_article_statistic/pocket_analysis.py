@@ -82,7 +82,6 @@ article_time_list = dict(article_time_list)
 time_x = [k for k in article_time_list.keys()]
 time_y = [v for v in article_time_list.values()]
 
-
 blog_link_x = [k for k in article_blog_link_list.keys()]
 blog_link_y = [v for v in article_blog_link_list.values()]
 
@@ -92,6 +91,8 @@ plt.xlabel('Date of saved article')
 plt.ylabel('Article Account')
 plt.plot(x, y, 'g', linewidth=2, )
 plt.grid(True)
+for a, b in zip(x, y):
+    plt.text(a, b + 0.05, '%.0f' % b, ha='center', va='bottom', fontsize=7)
 plt.legend()
 plt.xticks(rotation=45)
 # plt.show()
@@ -102,6 +103,8 @@ plt.xlabel('Time of saved article')
 plt.ylabel('Article Account')
 plt.plot(time_x, time_y, 'r', linewidth=2, )
 plt.grid(True)
+for a, b in zip(time_x, time_y):
+    plt.text(a, b + 0.05, '%.0f' % b, ha='center', va='bottom', fontsize=7)
 plt.legend()
 plt.xticks(rotation=45)
 plt.xticks(np.arange(min(time_x), max(time_x) + 1, 1.0))
@@ -111,8 +114,11 @@ plt.figure(figsize=(200, 100))
 plt.title("Saved Article Statistics by website")
 plt.xlabel('the website of article source')
 plt.ylabel('Article Number')
-plt.plot(blog_link_x, blog_link_y, 'r', linewidth=2, )
+plt.plot(blog_link_x, blog_link_y, 'r', linewidth=2)
 plt.grid(True)
 plt.legend()
 plt.xticks(range(len(blog_link_x)), blog_link_x, rotation=90)
+
+for a, b in zip(blog_link_x, blog_link_y):
+    plt.text(a, b + 0.05, '%.0f' % b, ha='center', va='bottom', fontsize=7)
 plt.show()
