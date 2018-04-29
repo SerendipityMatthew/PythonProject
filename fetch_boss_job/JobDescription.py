@@ -3,28 +3,25 @@ import time
 from bs4 import BeautifulSoup
 
 """
-    https://www.zhipin.com/job_detail/?query=&scity=101020100&industry=&position=100109    上海python
-    https://www.zhipin.com/job_detail/?query=&scity=101020100&industry=&position=100101    上海Java
-    https://www.zhipin.com/job_detail/?query=&scity=101010100&industry=&position=100109    北京Python
-    https://www.zhipin.com/job_detail/?query=&scity=101010100&industry=&position=100101    北京Java
-    https://www.zhipin.com/job_detail/?query=&scity=101190100&industry=&position=100109    南京Python
-    https://www.zhipin.com/job_detail/?query=&scity=101190100&industry=&position=100101    南京Java
-    https://www.zhipin.com/job_detail/?query=&scity=101210100&industry=&position=100109    杭州Python
-    https://www.zhipin.com/job_detail/?query=&scity=101210100&industry=&position=100101    杭州Java
+example:https://www.zhipin.com/{industry}{city}{position}/h_101010100/?page=2&ka=page-2  北京, Java, Media
+        https://www.zhipin.com/i100003-c101010100-p100101/h_101010100/?page=2&ka=page-2  北京, Java, Media
+        https://www.zhipin.com/i100003-c101010100-p100102/h_101010100/?page=2&ka=page-2  北京, C++, Media
+        https://www.zhipin.com/i100021-c101010100-p100102/h_101010100/?page=2&ka=page-2  北京, C++, 计算机软件
+        https://www.zhipin.com/i100002-c101020100-p100101/h_101020100/?page=2&ka=page-2  上海, Java, 游戏
     
     北京, 上海, 杭州, 深圳, 广州, 南京, 苏州
 """
 
 from parse_html import parse_job_list
 
-url_other = 'https://www.zhipin.com/c101020100-p100109/?page=%s&ka=page-%s'
+url_other = 'https://www.zhipin.com/{industry}{city}{position}/h_101010100/?page={page}&ka=page-{page}'
 headers = {
     'Referer': 'https://www.zhipin.com/',
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.18 Safari/537.36'
 }
 url_list = list()
 for i in range(1, 4):
-    url = url_other % (i, i)
+    url = url_other.format(industry='', city='c101020100-', position='p100109', page='1')
     url_list.append(url)
 
 
@@ -37,8 +34,9 @@ def request_url(url):
     return result
 
 
+# fetch all pages of Python job, each page as a elements
 request_list = map(request_url, url_list)
-
+#  all pages of python job should be in a list, then we use the map function
 all_job_list = []
 for r in request_list:
     all_job_list.extend(r)

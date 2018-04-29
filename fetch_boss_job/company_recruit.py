@@ -10,9 +10,12 @@ class RecruitInfo:
         financing =
         num_employee =
     """
+
     # Should I use  *args, **kwargs
     def __init__(self, job_title, salary, site, education,
-                 company_name, financing, num_employee, release_date, experiences, tag, hr_name):
+                 company_name, financing, num_employee, release_date,
+                 experiences, tag, hr_name, job_detail_link,
+                 company_detail_link):
         self.job_title = job_title
         self.salary = salary
         self.site = site
@@ -24,9 +27,11 @@ class RecruitInfo:
         self.experiences = experiences
         self.tag = tag
         self.hr_name = hr_name
+        self.job_detail_link = job_detail_link
+        self.company_detail_link = company_detail_link
 
     def get_all_attrs(self):
-        return ";".join("{}={}".format(k, getattr(self, k)) for k in self.__dict__.keys())
+        return "; ".join("{}={}".format(k, getattr(self, k)) for k in self.__dict__.keys())
 
     def __str__(self):
         return "[{}:{}]".format(self.__class__.__name__, self.get_all_attrs())
